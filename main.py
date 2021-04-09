@@ -1,4 +1,5 @@
 from random import sample
+import pygame
 
 
 class Sudoku:
