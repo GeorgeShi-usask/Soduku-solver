@@ -1,20 +1,31 @@
-import pprint
-
-import numpy
+from random import sample
 
 
 class Sudoku:
     def __init__(self):
-        self.gameBoard = numpy.matrix()
-
-        return
-
-    def random_board(self, this):
         """
-        generate a random sudoku game board
+        generate a random sudoku game board that can be solved
         :return:
         """
-        return
+        base = 3
+        side = base * base
+
+        def pattern(r, c): return (base * (r % base) + r // base + c) % side
+
+        def shuffle(s): return sample(s, len(s))
+
+        rBase = range(base)
+        rows = [g * base + r for g in shuffle(rBase) for r in shuffle(rBase)]
+        cols = [g * base + c for g in shuffle(rBase) for c in shuffle(rBase)]
+        nums = shuffle(range(1, side + 1))
+
+        self.gameBoard = [[nums[pattern(r, c)] for c in cols] for r in rows]
+
+        squares = side * side
+        empties = squares * 3 // 4
+
+        for p in sample(range(squares), empties):
+            self.gameBoard[p // side][p % side] = 0
 
     def display(self):
         """
@@ -25,14 +36,14 @@ class Sudoku:
             if i % 3 == 0 and i != 0:
                 print("- - - - - - - - - - - -")
 
-                for j in range(len(self.gameBoard[0])):
-                    if j % 3 == 0 and j != 0:
-                        print(" | ", end="")
-                    if j == 8:
-                        print(self.gameBoard[i][j])
-                    else:
-                        print(str(self.gameBoard[i][j]) + " ", end="")
-    
+            for j in range(len(self.gameBoard[0])):
+                if j % 3 == 0 and j != 0:
+                    print(" | ", end="")
+                if j == 8:
+                    print(self.gameBoard[i][j])
+                else:
+                    print(str(self.gameBoard[i][j]) + " ", end="")
+
     def take_num_input(self):
         """
         function that takes in the user input number
@@ -45,7 +56,21 @@ class Sudoku:
         by pressing space, automatically solve the sudoku
         :return:
         """
-        return
+        find = Sudoku.find_empty()
+        if not find:
+            return True
+        else:
+            row, col = find
+            for i in range(1, 10):
+                if not (Sudoku.check_row(find, i) and
+                        Sudoku.check_col(find, i) and
+                        Sudoku.check_square(find, i)):
+                    self.gameBoard[row][col] = i
+                    if Sudoku.solve():
+                        return True
+                self.gameBoard[row][col] = 0
+
+        return False
 
     def check_row(self, pos, num):
         """
@@ -98,12 +123,11 @@ class Sudoku:
             for col in range(len(self.gameBoard[0])):
                 if self.gameBoard[row][col] == 0:
                     return (row, col)
+        return None
 
-    def is_finished(self):
-        """
-        check if the game is finished, no more empty space
-        :return:
-        """
 
-        return
-
+board = Sudoku().gameBoard
+Sudoku.display(board)
+# print("_______________________")
+# Sudoku.solve()
+# Sudoku.display(board)
