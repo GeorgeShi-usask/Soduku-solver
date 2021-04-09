@@ -56,17 +56,17 @@ class Sudoku:
         by pressing space, automatically solve the sudoku
         :return:
         """
-        find = Sudoku.find_empty()
+        find = self.find_empty()
         if not find:
             return True
         else:
             row, col = find
             for i in range(1, 10):
-                if not (Sudoku.check_row(find, i) and
-                        Sudoku.check_col(find, i) and
-                        Sudoku.check_square(find, i)):
+                if (not self.check_row(find, i)) and \
+                        (not self.check_col(find, i)) and \
+                        (not self.check_square(find, i)):
                     self.gameBoard[row][col] = i
-                    if Sudoku.solve():
+                    if self.solve():
                         return True
                 self.gameBoard[row][col] = 0
 
@@ -126,8 +126,3 @@ class Sudoku:
         return None
 
 
-board = Sudoku().gameBoard
-Sudoku.display(board)
-# print("_______________________")
-# Sudoku.solve()
-# Sudoku.display(board)
