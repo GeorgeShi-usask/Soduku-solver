@@ -1,9 +1,11 @@
 from random import sample
-import pygame
 
 
 class Sudoku:
     def __init__(self):
+        self.gameBoard = []
+
+    def random_board(self):
         """
         generate a random sudoku game board that can be solved
         :return:
@@ -44,13 +46,6 @@ class Sudoku:
                     print(self.gameBoard[i][j])
                 else:
                     print(str(self.gameBoard[i][j]) + " ", end="")
-
-    def take_num_input(self):
-        """
-        function that takes in the user input number
-        :return:
-        """
-        return
 
     def solve(self):
         """
@@ -105,12 +100,12 @@ class Sudoku:
         :return: bool, if exists, return True; else, return False
         """
         # find which box the num is at
-        box_col = pos[1] // 3
-        box_row = pos[0] // 3
+        box_col = pos[1] // 3 * 3
+        box_row = pos[0] // 3 * 3
 
         # loop through all 9 elements in the box to check for duplicates
-        for i in range(box_row * 3, box_row * 3 + 3):
-            for j in range(box_col * 3, box_col * 3 + 3):
+        for i in range(box_row, box_row + 3):
+            for j in range(box_col, box_col + 3):
                 if self.gameBoard[i][j] == num and (i, j) != pos:
                     return True
         return False
@@ -127,3 +122,8 @@ class Sudoku:
         return None
 
 
+board = Sudoku()
+board.random_board()
+board.display()
+board.solve()
+board.display()
