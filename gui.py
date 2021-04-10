@@ -4,53 +4,60 @@ from main import Sudoku
 
 
 class GameBoard:
-    def __init__(self, board, width, height):
-        self.board = board
+    def __init__(self, board, width, height, win):
+        self.model = board
         self.rows = len(board)
         self.cols = len(board[0])
-        self.cells = [[Cell(self.board[i][j], i, j, width, height) for j in range(len(board[0]))]
+        self.cells = [[Cell(self.model[i][j], i, j, width, height) for j in range(len(board[0]))]
                       for i in range(len(board))]
         self.width = width
         self.height = height
-        self.model = None
+
         self.selected = None
+        self.win = win
 
     def update_model(self):
         self.model = [[self.cells[i][j].value for j in range(self.cols)] for i in range(self.rows)]
 
     def place(self, val):
+        """
+        place the val in the cells, if place,
+        the val can't be changed or deleted
+        :param val:
+        :return:
+        """
         row, col = self.selected
-        if self.cells[row][col].set(val) == 0:
+        if self.cells[row][col].value == 0:
             self.cells[row][col].set(val)
             self.update_model()
 
-            if ((not Sudoku.check_row(self.model, (row, col), val)) and
-                (not Sudoku.check_col(self.model, (row, col), val)) and
-                (not Sudoku.check_square(self.model, (row, col), val))) and Sudoku.solve(self.model):
-                return True
-            else:
-                self.cells[row][col].set(0)
-                self.cells[row][col].set_temp(0)
-                self.update_model()
-                return False
-
     def sketch(self, val):
+        """
+        sketch the temp val to the cells on the board
+        temp val can be changed or deleted
+        :param val:
+        :return:
+        """
         row, col = self.selected
         self.cells[row][col].set_temp(val)
 
-    def draw(self, win):
+    def draw(self):
+        """
+        function to draw the board
+        :return:
+        """
         interval = self.width / 9
         for i in range(self.rows + 1):
             if i % 3 == 0 and i != 0:
                 thick = 4
             else:
                 thick = 1
-            pg.draw.line(win, (0, 0, 0), (0, i * interval), (self.width, i * interval), thick)
-            pg.draw.line(win, (0, 0, 0), (i * interval, 0), (i * interval, self.height), thick)
+            pg.draw.line(self.win, (0, 0, 0), (0, i * interval), (self.width, i * interval), thick)
+            pg.draw.line(self.win, (0, 0, 0), (i * interval, 0), (i * interval, self.height), thick)
 
         for i in range(self.rows):
             for j in range(self.cols):
-                self.cells[i][j].draw(win)
+                self.cells[i][j].draw(self.win)
 
     def select(self, row, col):
         # Reset all other
@@ -74,6 +81,9 @@ class GameBoard:
             return (int(y), int(x))
         else:
             return None
+
+    def solve(self):
+        
 
     def is_finished(self):
         for i in range(self.rows):
@@ -135,7 +145,7 @@ def redraw(win, board, time):
     text = fnt.render("Time: " + format_time(time), 1, (0, 0, 0))
     win.blit(text, (380, 560))
 
-    board.draw(win)
+    board.draw()
 
 
 def main():
@@ -143,7 +153,7 @@ def main():
     pg.display.set_caption("Sudoku")
     sudoku = Sudoku()
     board = sudoku.random_board()
-    gameboard = GameBoard(board, 540, 540)
+    gameboard = GameBoard(board, 540, 540, win)
     key = None
     run = True
     start = time.time()
@@ -176,6 +186,8 @@ def main():
                 if event.key == pg.K_DELETE:
                     gameboard.clear()
                     key = None
+                if event.key == pg.K_SPACE:
+                    gameboard.solve()
                 if event.key == pg.K_RETURN:
                     i, j = gameboard.selected
                     if gameboard.cells[i][j].temp != 0:
