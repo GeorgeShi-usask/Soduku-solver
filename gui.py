@@ -189,7 +189,7 @@ def redraw(win, board, time):
 
     fnt = pg.font.SysFont("comicsans", 40)
     text = fnt.render("Time: " + format_time(time), 1, (0, 0, 0))
-    win.blit(text, (380, 560))
+    win.blit(text, (350, 560))
 
     board.draw()
 
