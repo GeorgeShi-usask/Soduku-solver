@@ -3,6 +3,9 @@ import time
 from main import Sudoku
 
 
+sudoku = Sudoku()
+
+
 class GameBoard:
     def __init__(self, board, width, height, win):
         self.model = board
@@ -83,7 +86,34 @@ class GameBoard:
             return None
 
     def solve(self):
-        
+        self.update_model()
+        find = sudoku.find_empty(self.model)
+        if not find:
+            return True
+        else:
+            row, col = find
+            for i in range(1, 10):
+                if (not sudoku.check_row(self.model, find, i)) and \
+                        (not sudoku.check_col(self.model, find, i)) and \
+                        (not sudoku.check_square(self.model, find, i)):
+                    self.model[row][col] = i
+                    self.cells[row][col].set(i)
+                    self.cells[row][col].draw_change(self.win, True)
+                    self.update_model()
+                    pg.display.update()
+                    pg.time.delay(100)
+
+                    if self.solve():
+                        return True
+
+                    self.model[row][col] = 0
+                    self.cells[row][col].set(0)
+                    self.update_model()
+                    self.cells[row][col].draw_change(self.win, False)
+                    pg.display.update()
+                    pg.time.delay(100)
+
+        return False
 
     def is_finished(self):
         for i in range(self.rows):
@@ -120,6 +150,22 @@ class Cell:
         if self.selected:
             pg.draw.rect(win, (255, 0, 0), (x, y, interval, interval), 3)
 
+    def draw_change(self, win, g=True):
+        fnt = pg.font.SysFont("comicsans", 40)
+
+        gap = self.width / 9
+        x = self.col * gap
+        y = self.row * gap
+
+        pg.draw.rect(win, (255, 255, 255), (x, y, gap, gap), 0)
+
+        text = fnt.render(str(self.value), 1, (0, 0, 0))
+        win.blit(text, (x + (gap / 2 - text.get_width() / 2), y + (gap / 2 - text.get_height() / 2)))
+        if g:
+            pg.draw.rect(win, (0, 255, 0), (x, y, gap, gap), 3)
+        else:
+            pg.draw.rect(win, (255, 0, 0), (x, y, gap, gap), 3)
+
     def set(self, val):
         self.value = val
 
@@ -151,7 +197,6 @@ def redraw(win, board, time):
 def main():
     win = pg.display.set_mode((540, 600))
     pg.display.set_caption("Sudoku")
-    sudoku = Sudoku()
     board = sudoku.random_board()
     gameboard = GameBoard(board, 540, 540, win)
     key = None
@@ -196,7 +241,6 @@ def main():
 
                         if gameboard.is_finished():
                             print("Game over")
-                            run = False
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 pos = pg.mouse.get_pos()
