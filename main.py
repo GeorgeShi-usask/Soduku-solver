@@ -48,7 +48,7 @@ class Sudoku:
 
     def solve(self, board):
         """
-        by pressing space, automatically solve the sudoku
+        automatically solve the sudoku
         :return:
         """
         find = self.find_empty(board)
