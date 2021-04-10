@@ -119,10 +119,3 @@ class Sudoku:
                 if board[row][col] == 0:
                     return (row, col)
         return None
-
-
-sudoku = Sudoku()
-board = sudoku.random_board()
-sudoku.display(board)
-sudoku.solve(board)
-sudoku.display(board)

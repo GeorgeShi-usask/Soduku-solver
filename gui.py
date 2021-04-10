@@ -82,6 +82,7 @@ class GameBoard:
                     return False
         return True
 
+
 class Cell:
 
     def __init__(self, value, row, col, width, height):
@@ -116,6 +117,9 @@ class Cell:
         self.temp = val
 
 
+pg.font.init()
+
+
 def format_time(secs):
     sec = secs % 60
     minute = secs // 60
@@ -124,17 +128,15 @@ def format_time(secs):
     return mat
 
 
-def redraw(win, board, time, strikes):
+def redraw(win, board, time):
     win.fill((255, 255, 255))
 
     fnt = pg.font.SysFont("comicsans", 40)
     text = fnt.render("Time: " + format_time(time), 1, (0, 0, 0))
     win.blit(text, (380, 560))
 
-    text = fnt.render("X " * strikes, 1, (255, 0, 0))
-    win.blit(text, (20, 560))
-
     board.draw(win)
+
 
 def main():
     win = pg.display.set_mode((540, 600))
@@ -145,7 +147,6 @@ def main():
     key = None
     run = True
     start = time.time()
-    strikes = 0
     while run:
 
         play_time = round(time.time() - start)
@@ -178,11 +179,7 @@ def main():
                 if event.key == pg.K_RETURN:
                     i, j = gameboard.selected
                     if gameboard.cells[i][j].temp != 0:
-                        if gameboard.place(gameboard.cells[i][j].temp):
-                            print("Success")
-                        else:
-                            print("Wrong")
-                            strikes += 1
+                        gameboard.place(gameboard.cells[i][j].temp)
                         key = None
 
                         if gameboard.is_finished():
@@ -199,7 +196,7 @@ def main():
         if gameboard.selected and key is not None:
             gameboard.sketch(key)
 
-        redraw(win, gameboard, play_time, strikes)
+        redraw(win, gameboard, play_time)
         pg.display.update()
 
 
