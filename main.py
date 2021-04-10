@@ -2,9 +2,6 @@ from random import sample
 
 
 class Sudoku:
-    def __init__(self):
-        self.gameBoard = []
-
     def random_board(self):
         """
         generate a random sudoku game board that can be solved
@@ -22,77 +19,79 @@ class Sudoku:
         cols = [g * base + c for g in shuffle(rBase) for c in shuffle(rBase)]
         nums = shuffle(range(1, side + 1))
 
-        self.gameBoard = [[nums[pattern(r, c)] for c in cols] for r in rows]
+        board = [[nums[pattern(r, c)] for c in cols] for r in rows]
 
         squares = side * side
         empties = squares * 3 // 4
 
         for p in sample(range(squares), empties):
-            self.gameBoard[p // side][p % side] = 0
+            board[p // side][p % side] = 0
 
-    def display(self):
+        return board
+
+    def display(self, board):
         """
         display the generated game board
         :return:
         """
-        for i in range(len(self.gameBoard)):
+        for i in range(len(board)):
             if i % 3 == 0 and i != 0:
                 print("- - - - - - - - - - - -")
 
-            for j in range(len(self.gameBoard[0])):
+            for j in range(len(board[0])):
                 if j % 3 == 0 and j != 0:
                     print(" | ", end="")
                 if j == 8:
-                    print(self.gameBoard[i][j])
+                    print(board[i][j])
                 else:
-                    print(str(self.gameBoard[i][j]) + " ", end="")
+                    print(str(board[i][j]) + " ", end="")
 
-    def solve(self):
+    def solve(self, board):
         """
         by pressing space, automatically solve the sudoku
         :return:
         """
-        find = self.find_empty()
+        find = self.find_empty(board)
         if not find:
             return True
         else:
             row, col = find
             for i in range(1, 10):
-                if (not self.check_row(find, i)) and \
-                        (not self.check_col(find, i)) and \
-                        (not self.check_square(find, i)):
-                    self.gameBoard[row][col] = i
-                    if self.solve():
+                if (not self.check_row(board, find, i)) and \
+                        (not self.check_col(board, find, i)) and \
+                        (not self.check_square(board, find, i)):
+                    board[row][col] = i
+                    if self.solve(board):
                         return True
-                self.gameBoard[row][col] = 0
+                board[row][col] = 0
 
         return False
 
-    def check_row(self, pos, num):
+    def check_row(self, board, pos, num):
         """
         check if the num has already been a part of that row
         :param pos: the position of that num
         :param num: the input num
         :return: bool, if exists, return True; else, return False
         """
-        for i in range(len(self.gameBoard[0])):
-            if self.gameBoard[pos[0]][i] == num and pos[1] != i:
+        for i in range(len(board[0])):
+            if board[pos[0]][i] == num and pos[1] != i:
                 return True
         return False
 
-    def check_col(self, pos, num):
+    def check_col(self, board, pos, num):
         """
         check if the num has already been a part of that col
         :param pos: the position of that num
         :param num: the input num
         :return: bool, if exists, return True; else, return False
         """
-        for i in range(len(self.gameBoard)):
-            if self.gameBoard[i][pos[1]] == num and pos[0] != i:
+        for i in range(len(board)):
+            if board[i][pos[1]] == num and pos[0] != i:
                 return True
         return False
 
-    def check_square(self, pos, num):
+    def check_square(self, board, pos, num):
         """
         check if the num has already been a part of that 3x3 square
         :param pos: the position of that num
@@ -106,24 +105,24 @@ class Sudoku:
         # loop through all 9 elements in the box to check for duplicates
         for i in range(box_row, box_row + 3):
             for j in range(box_col, box_col + 3):
-                if self.gameBoard[i][j] == num and (i, j) != pos:
+                if board[i][j] == num and (i, j) != pos:
                     return True
         return False
 
-    def find_empty(self):
+    def find_empty(self, board):
         """
         find the empty spaces in the game
         :return: a tuple of row and col of that empty space
         """
-        for row in range(len(self.gameBoard)):
-            for col in range(len(self.gameBoard[0])):
-                if self.gameBoard[row][col] == 0:
+        for row in range(len(board)):
+            for col in range(len(board[0])):
+                if board[row][col] == 0:
                     return (row, col)
         return None
 
 
-board = Sudoku()
-board.random_board()
-board.display()
-board.solve()
-board.display()
+sudoku = Sudoku()
+board = sudoku.random_board()
+sudoku.display(board)
+sudoku.solve(board)
+sudoku.display(board)
